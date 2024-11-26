@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    env:
+      PORT: ${{ secrets.PORT }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      OPENID_CLIENT_ID: ${{ secrets.OPENID_CLIENT_ID }}
+      OPENID_CLIENT_SECRET: ${{ secrets.OPENID_CLIENT_SECRET }}
+      OPENID_ENDPOINT: ${{ secrets.OPENID_ENDPOINT }}
+      SMS_SANDBOX_API_KEY: ${{ secrets.SMS_SANDBOX_API_KEY }}
+      SMS_SANDBOX_API_USERNAME: ${{ secrets.SMS_SANDBOX_API_USERNAME }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22'
+
+      - name: Test
+        working-directory: ./backend
+        run: make test
+
+      - name: Coverage
+        working-directory: ./backend
+        run: make coverage
+
+      - name: Clean
+        working-directory: ./backend
+        run: make clean
